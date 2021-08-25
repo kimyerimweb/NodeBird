@@ -4,16 +4,16 @@ import Link from "next/link";
 import { Menu, Input, Row, Col } from "antd";
 import MenuItem from "antd/lib/menu/MenuItem";
 import LoginForm from "./LoginForm";
+import UserProfile from "./UserProfile";
 import styled from "styled-components";
+
+const { useState } = React;
+const { Search } = Input;
 
 const MiddleSearch = styled(Input.Search)`
   width: 200px;
   vertical-align: middle;
 `;
-
-const { useState } = React;
-
-const { Search } = Input;
 
 const AppLayout = ({ children }) => {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -43,9 +43,17 @@ const AppLayout = ({ children }) => {
         </MenuItem>
       </Menu>
       <Row gutter={8}>
-        <Col xs={24}>{isLoggedIn ? <UserProfile /> : <LoginForm />}</Col>
-        <Col xs={24}>{children}</Col>
-        <Col xs={24}></Col>
+        <Col xs={24} md={6}>
+          {isLoggedIn ? (
+            <UserProfile setLoggedIn={setLoggedIn} />
+          ) : (
+            <LoginForm setLoggedIn={setLoggedIn} />
+          )}
+        </Col>
+        <Col xs={24} md={12}>
+          {children}
+        </Col>
+        <Col xs={24} md={6}></Col>
       </Row>
     </div>
   );
