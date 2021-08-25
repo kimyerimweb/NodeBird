@@ -4,6 +4,12 @@ import Link from "next/link";
 import { Menu, Input, Row, Col } from "antd";
 import MenuItem from "antd/lib/menu/MenuItem";
 import LoginForm from "./LoginForm";
+import styled from "styled-components";
+
+const MiddleSearch = styled(Input.Search)`
+  width: 200px;
+  vertical-align: middle;
+`;
 
 const { useState } = React;
 
@@ -25,10 +31,9 @@ const AppLayout = ({ children }) => {
           </Link>
         </MenuItem>
         <MenuItem>
-          <Search
+          <MiddleSearch
             placeholder="input search text"
             //onSearch={onSearch}
-            style={{ width: 200, verticalAlign: "middle" }}
           />
         </MenuItem>
         <MenuItem>
