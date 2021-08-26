@@ -6,17 +6,14 @@ import MenuItem from "antd/lib/menu/MenuItem";
 import LoginForm from "./LoginForm";
 import UserProfile from "./UserProfile";
 import styled from "styled-components";
-
-const { useState } = React;
-const { Search } = Input;
-
+import { useSelector } from "react-redux";
 const MiddleSearch = styled(Input.Search)`
   width: 200px;
   vertical-align: middle;
 `;
 
 const AppLayout = ({ children }) => {
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   return (
     <div>
       <Menu mode="horizontal">
@@ -44,11 +41,7 @@ const AppLayout = ({ children }) => {
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6}>
-          {isLoggedIn ? (
-            <UserProfile setLoggedIn={setLoggedIn} />
-          ) : (
-            <LoginForm setLoggedIn={setLoggedIn} />
-          )}
+          {isLoggedIn ? <UserProfile /> : <LoginForm />}
         </Col>
         <Col xs={24} md={12}>
           {children}
