@@ -43,6 +43,9 @@ const rootReducer = (state = initialState, action) => {
           isLoggedIn: false,
         },
       };
+
+    default:
+      return { ...state };
   }
 };
 
