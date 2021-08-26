@@ -1,10 +1,16 @@
-import { createStore } from "redux";
+import { applyMiddleware, createStore, compose } from "redux";
 import { createWrapper } from "next-redux-wrapper";
-
 import reducer from "../reducers";
+import { composeWithDevTools } from "redux-devtools-extension";
 
 const configureStore = () => {
-  const store = createStore(reducer);
+  const middlewares = [];
+  const enhancer =
+    process.env.NODE_ENV === "production"
+      ? compose(applyMiddleware(...middlewares)) //배포용에서는 개발자도구와 연결안함
+      : composeWithDevTools(applyMiddleware(...middlewares)); //배포용에서는 개발자도구와 연결
+
+  const store = createStore(reducer, enhancer);
   return store;
 };
 
