@@ -10,7 +10,7 @@ const ErrorMessage = styled.div`
 `
 
 const Signup = () => {
-  const [id, onChangeId] = useInput('')
+  const [email, onChangeEmail] = useInput('')
   const [nickname, onChangeNickname] = useInput('')
   const [password, onChangePassword] = useInput('')
 
@@ -40,7 +40,7 @@ const Signup = () => {
       return setTermError(true)
     }
 
-    console.log(id, nickname, password)
+    console.log(email, nickname, password)
   }, [])
 
   return (
@@ -51,9 +51,14 @@ const Signup = () => {
       <AppLayout>
         <Form onFinish={onSubmit}>
           <div>
-            <label htmlFor="user-id">아이디</label>
+            <label htmlFor="user-email">아이디</label>
             <br />
-            <Input name="user-id" value={id} required onChange={onChangeId} />
+            <Input
+              name="user-email"
+              value={email}
+              required
+              onChange={onChangeEmail}
+            />
           </div>
           <div>
             <label htmlFor="user-nickname">닉네임</label>
