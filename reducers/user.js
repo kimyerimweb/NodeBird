@@ -1,8 +1,8 @@
 export const initialState = {
-  logInLoading: false,
+  logInLoading: false, //로그인 시도중
   logInError: null,
   logInDone: false,
-  logOutLoading: false,
+  logOutLoading: false, //로그아웃 시도중
   signUpLoading: false,
   signUpDone: false,
   signUpError: null,
