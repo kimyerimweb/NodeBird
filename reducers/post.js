@@ -83,12 +83,12 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST'
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS'
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE'
 
-export const addPost = (data) => ({
+export const addPostRequestAction = (data) => ({
   type: ADD_POST_REQUEST,
-  data,
+  data: dummyPost, //form에 뭔가 입력했을 때 다음으로 안넘어감 거기서 문제 있는 듯
 })
 
-export const addComment = (data) => ({
+export const addCommentRequestAction = (data) => ({
   type: ADD_COMMENT_REQUEST,
   data,
 })
