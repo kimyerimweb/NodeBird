@@ -20,8 +20,8 @@ const PostForm = () => {
   }, [addPostDone])
 
   const onSubmit = useCallback(() => {
-    dispatch(addPostRequestAction({})) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
-  }, [])
+    dispatch(addPostRequestAction(text)) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
+  }, [text])
 
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click() //이미지 업로드용 인풋은 숨겨져 있고 버튼이 대신하고 있는데, 버튼을 누르면 인풋을 누르게끔 ref를 이용한다.

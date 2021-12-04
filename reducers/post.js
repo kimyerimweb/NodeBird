@@ -44,13 +44,13 @@ export const initialState = {
   addCommentError: null,
 }
 
-const dummyPost = {
+const dummyPost = (data) => ({
   id: 2,
   User: {
     id: 2,
     nickname: '예림킴',
   },
-  content: '두 번째 게시글 #해시태그 #뷰뷰뷰',
+  content: data,
   Images: [
     {
       src: 'https://media.vlpt.us/images/taese0ng/post/82c7a9ee-7d30-44eb-be74-6814dd66b64c/logo-vuejs-min.png',
@@ -73,7 +73,7 @@ const dummyPost = {
       content: '뷰가 좀 더 쉽긴 한 것 같네요',
     },
   ],
-}
+})
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST'
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS'
@@ -85,7 +85,7 @@ export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE'
 
 export const addPostRequestAction = (data) => ({
   type: ADD_POST_REQUEST,
-  data: dummyPost, //form에 뭔가 입력했을 때 다음으로 안넘어감 거기서 문제 있는 듯
+  data, //form에 뭔가 입력했을 때 다음으로 안넘어감 거기서 문제 있는 듯
 })
 
 export const addCommentRequestAction = (data) => ({
@@ -104,7 +104,7 @@ const reducer = (state = initialState, action) => {
     case ADD_POST_SUCCESS:
       return {
         ...state,
-        mainPosts: [dummyPost, ...state.mainPosts],
+        mainPosts: [dummyPost(action.data), ...state.mainPosts],
         addPostDone: true,
         addPostLoading: false,
       }
