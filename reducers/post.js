@@ -1,3 +1,5 @@
+import shortId from 'shortid'
+
 export const initialState = {
   //이제 더미 데이터를 useState말고 여기다 넣으면 된다.
   mainPosts: [
@@ -45,7 +47,7 @@ export const initialState = {
 }
 
 const dummyPost = (data) => ({
-  id: 2,
+  id: shortId.generate(),
   User: {
     id: 2,
     nickname: '예림킴',
