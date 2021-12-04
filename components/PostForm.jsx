@@ -1,22 +1,26 @@
 import { Button, Form, Input } from 'antd'
-import { useCallback, useState, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import useInput from '../hooks/useInput'
 import { addPostRequestAction } from '../reducers/post'
 
 const PostForm = () => {
   const imageInput = useRef()
 
   const { imagePaths } = useSelector((state) => state.post)
+  const { addPostDone } = useSelector((state) => state.post)
   const dispatch = useDispatch()
 
-  const [text, setText] = useState('')
-  const onChangeText = useCallback((e) => {
-    setText(e.target.value)
-  }, [])
+  const [text, setText, onChangeText] = useInput('')
+
+  useEffect(() => {
+    if (addPostDone) {
+      setText('')
+    }
+  }, [addPostDone])
 
   const onSubmit = useCallback(() => {
-    setText('')
-    dispatch(addPostRequestAction()) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
+    dispatch(addPostRequestAction({})) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
   }, [])
 
   const onClickImageUpload = useCallback(() => {
