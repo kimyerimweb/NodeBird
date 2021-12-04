@@ -17,8 +17,8 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch()
-  const [email, onChangeEmail] = useInput('')
-  const [password, onChangePassword] = useInput('')
+  const [email, setEmail, onChangeEmail] = useInput('')
+  const [password, setPassword, onChangePassword] = useInput('')
   const { logInLoading } = useSelector((state) => state.user)
 
   const onSubmitForm = useCallback(() => {
