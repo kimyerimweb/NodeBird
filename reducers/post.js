@@ -46,6 +46,17 @@ export const initialState = {
   addCommentError: null,
 }
 
+const dummyComment = (data) => ({
+  id: shortId.generate(),
+  content: data,
+  User: {
+    id: 1,
+    nickname: '제로초',
+  },
+  Imagrs: [],
+  Comments: [],
+})
+
 const dummyPost = (data) => ({
   id: shortId.generate(),
   User: {
@@ -127,10 +138,19 @@ const reducer = (state = initialState, action) => {
       }
 
     case ADD_COMMENT_SUCCESS:
+      const postIndex = state.mainPosts.findIndex(
+        (v) => v.id === action.data.postId
+      )
+      const post = state.mainPosts[postIndex]
+      const Comments = [dummyComment(action.data.content), ...post.Comments]
+      const mainPosts = [...state.mainPosts]
+      mainPosts[postIndex] = { ...post, Comments }
+
       return {
         ...state,
         addCommentLoading: false,
         addCommentDone: true,
+        mainPosts: mainPosts,
       }
 
     case ADD_COMMENT_FAILURE:
