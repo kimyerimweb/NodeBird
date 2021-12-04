@@ -8,7 +8,7 @@ const PostForm = () => {
   const imageInput = useRef()
 
   const { imagePaths } = useSelector((state) => state.post)
-  const { addPostDone } = useSelector((state) => state.post)
+  const { addPostDone, addPostLoading } = useSelector((state) => state.post)
   const dispatch = useDispatch()
 
   const [text, setText, onChangeText] = useInput('')
@@ -42,7 +42,12 @@ const PostForm = () => {
       <div>
         <input type="file" multiple hidden ref={imageInput} />
         <Button onClick={onClickImageUpload}>이미지 업로드</Button>
-        <Button type="primary" style={{ float: 'right' }} htmlType="submit">
+        <Button
+          type="primary"
+          style={{ float: 'right' }}
+          htmlType="submit"
+          loading={addPostLoading}
+        >
           짹짹
         </Button>
         <div>
