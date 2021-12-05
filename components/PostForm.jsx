@@ -7,8 +7,10 @@ import { addPostRequestAction } from '../reducers/post'
 const PostForm = () => {
   const imageInput = useRef()
 
+  const userId = useSelector((state) => state.user.me?.id)
   const { imagePaths } = useSelector((state) => state.post)
-  const { addPostDone, addPostLoading } = useSelector((state) => state.post)
+  const { addPostLoading } = useSelector((state) => state.post)
+  const { addPostDone } = useSelector((state) => state.post)
   const dispatch = useDispatch()
 
   const [text, setText, onChangeText] = useInput('')
@@ -20,7 +22,7 @@ const PostForm = () => {
   }, [addPostDone])
 
   const onSubmit = useCallback(() => {
-    dispatch(addPostRequestAction(text)) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
+    dispatch(addPostRequestAction({ content: text, userId })) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
   }, [text])
 
   const onClickImageUpload = useCallback(() => {

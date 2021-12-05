@@ -4,9 +4,9 @@ export const initialState = {
   //이제 더미 데이터를 useState말고 여기다 넣으면 된다.
   mainPosts: [
     {
-      id: 1,
+      id: '1',
       User: {
-        id: 1,
+        id: '1',
         nickname: '김예림',
       },
       content: '첫 번째 게시글 #해시태그 #익스프레스',
@@ -41,6 +41,9 @@ export const initialState = {
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
+  removePostLoading: false,
+  removePostDone: false,
+  removePostError: null,
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
@@ -58,12 +61,12 @@ const dummyComment = (data) => ({
 })
 
 const dummyPost = (data) => ({
-  id: shortId.generate(),
+  id: data.id,
   User: {
-    id: 2,
+    id: data.userId,
     nickname: '예림킴',
   },
-  content: data,
+  content: data.content,
   Images: [
     {
       src: 'https://media.vlpt.us/images/taese0ng/post/82c7a9ee-7d30-44eb-be74-6814dd66b64c/logo-vuejs-min.png',
@@ -92,6 +95,10 @@ export const ADD_POST_REQUEST = 'ADD_POST_REQUEST'
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS'
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE'
 
+export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST'
+export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS'
+export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE'
+
 export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST'
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS'
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE'
@@ -99,6 +106,11 @@ export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE'
 export const addPostRequestAction = (data) => ({
   type: ADD_POST_REQUEST,
   data, //form에 뭔가 입력했을 때 다음으로 안넘어감 거기서 문제 있는 듯
+})
+
+export const removePostRequestAction = (data) => ({
+  type: REMOVE_POST_REQUEST,
+  data,
 })
 
 export const addCommentRequestAction = (data) => ({
@@ -112,6 +124,8 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         addPostLoading: true,
+        addPostDone: false,
+        addPostError: null,
       }
 
     case ADD_POST_SUCCESS:
@@ -125,8 +139,30 @@ const reducer = (state = initialState, action) => {
     case ADD_POST_FAILURE:
       return {
         ...state,
-        addPostDone: false,
         addPostLoading: false,
+        addPostError: action.error,
+      }
+
+    case REMOVE_POST_REQUEST:
+      return {
+        ...state,
+        removePostLoading: true,
+        removePostError: null,
+      }
+
+    case REMOVE_POST_SUCCESS:
+      return {
+        ...state,
+        mainPosts: state.mainPosts.filter((el) => el.id !== action.data),
+        removePostDone: true,
+        removePostLoading: false,
+      }
+
+    case REMOVE_POST_FAILURE:
+      return {
+        ...state,
+        removePostLoading: false,
+        removePostError: action.error,
       }
 
     case ADD_COMMENT_REQUEST:

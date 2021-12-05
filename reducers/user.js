@@ -1,3 +1,5 @@
+import shortId from 'shortid'
+
 export const initialState = {
   logInLoading: false, //로그인 시도중
   logInError: null,
@@ -33,6 +35,9 @@ export const CHANGE_NICKNAME_REQUEST = 'CHANGE_NICKNAME_REQUEST'
 export const CHANGE_NICKNAME_SUCCESS = 'CHANGE_NICKNAME_SUCCESS'
 export const CHANGE_NICKNAME_FAILURE = 'CHANGE_NICKNAME_FAILURE'
 
+export const ADD_POST_TO_ME = 'ADD_POST_TO_ME' //다른 리듀서 내부의 state를 바탕으로 이쪽 리듀서의 state를 변경하기 위한 액션
+export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME' //state를 바꾸는건 action이니까
+
 export const logInRequestAction = (data) => {
   return {
     type: LOG_IN_REQUEST,
@@ -62,10 +67,18 @@ export const changeNicknameRequestAction = (data) => {
 const dummyUser = (data) => ({
   ...data,
   nickname: 'zerocho',
-  id: 1,
+  id: shortId.generate(),
   Posts: [],
-  Followings: [],
-  Followers: [],
+  Followings: [
+    { nickname: '제로초' },
+    { nickname: '부기초' },
+    { nickname: '냥냥' },
+  ],
+  Followers: [
+    { nickname: '제로초' },
+    { nickname: '부기초' },
+    { nickname: '냥냥' },
+  ],
 })
 
 const reducer = (state = initialState, action) => {
@@ -153,6 +166,24 @@ const reducer = (state = initialState, action) => {
         ...state,
         changeNicknameLoading: false,
         changeNicknameError: action.error,
+      }
+
+    case ADD_POST_TO_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: [{ id: action.data }, ...state.me.Posts],
+        },
+      }
+
+    case REMOVE_POST_OF_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: state.me.Posts.filter((el) => el.id !== action.data),
+        },
       }
 
     default:
