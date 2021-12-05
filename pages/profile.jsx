@@ -1,9 +1,14 @@
+import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import Head from 'next/head'
 import AppLayout from '../components/AppLayout'
 import NicknameEditForm from '../components/NicknameEditForm'
 import FollowList from '../components/FollowList'
+import Router from 'next/router'
 
 const Profile = () => {
+  const { me } = useSelector((state) => state.user)
+
   const followerList = [
     { nickname: '제로초0' },
     { nickname: '제로초1' },
@@ -14,6 +19,17 @@ const Profile = () => {
     { nickname: '제로초4' },
     { nickname: '제로초5' },
   ]
+
+  useEffect(() => {
+    //프로필 페이지에서 로그아웃시
+    if (!(me && me.id)) {
+      Router.push('/')
+    }
+  }, [me && me.id])
+
+  if (!me) {
+    return null //로딩을 안함. 지금 페이지에 그대로 있음
+  }
 
   return (
     <>
