@@ -1,4 +1,5 @@
 import shortId from 'shortid'
+import produce from 'immer'
 
 export const initialState = {
   logInLoading: false, //로그인 시도중
@@ -82,113 +83,86 @@ const dummyUser = (data) => ({
 })
 
 const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case LOG_IN_REQUEST:
-      return {
-        ...state,
-        logInLoading: true,
-        logInError: null,
-        logInDone: false,
-      }
+  return produce(state, (draft) => {
+    switch (action.type) {
+      case LOG_IN_REQUEST:
+        draft.logInLoading = true
+        draft.logInError = null
+        draft.logInDone = false
+        break
 
-    case LOG_IN_SUCCESS: //사가가 호출해주는 액션이라서 굳이 위에서 만들어줄 필요는 없음
-      return {
-        ...state,
-        logInLoading: false,
-        logInDone: true,
-        me: dummyUser(action.data),
-      }
+      case LOG_IN_SUCCESS: //사가가 호출해주는 액션이라서 굳이 위에서 만들어줄 필요는 없음
+        draft.logInLoading = false
+        draft.logInDone = true
+        draft.me = dummyUser(action.data)
+        break
 
-    case LOG_IN_FAILURE:
-      return {
-        ...state,
-        logInLoading: false,
-        logInError: action.error,
-      }
+      case LOG_IN_FAILURE:
+        draft.logInLoading = false
+        draft.logInError = action.error
+        break
 
-    case LOG_OUT_REQUEST:
-      return {
-        ...state,
-        logOutError: null,
-        logOutDone: false,
-        logOutLoading: true,
-      }
+      case LOG_OUT_REQUEST:
+        draft.logOutError = null
+        draft.logOutDone = false
+        draft.logOutLoading = true
+        break
 
-    case LOG_OUT_SUCCESS:
-      return {
-        ...state,
-        logOutDone: false,
-        logOutLoading: false,
-        me: null,
-      }
+      case LOG_OUT_SUCCESS:
+        draft.logOutDone = false
+        draft.logOutLoading = false
+        draft.me = null
+        break
 
-    case LOG_OUT_FAILURE:
-      return {
-        ...state,
-        logOutError: action.error,
-        logOutLoading: false,
-      }
+      case LOG_OUT_FAILURE:
+        draft.logOutError = action.error
+        draft.logOutLoading = false
+        break
 
-    case SIGN_UP_REQUEST:
-      return {
-        ...state,
-        signUpDone: false,
-        signUpLoading: true,
-        signUpError: null,
-      }
-    case SIGN_UP_SUCCESS:
-      return {
-        ...state,
-        signUpDone: true,
-        signUpLoading: false,
-      }
-    case SIGN_UP_FAILURE:
-      return {
-        ...state,
-        signUpLoading: false,
-        signUpError: action.error,
-      }
-    case CHANGE_NICKNAME_REQUEST:
-      return {
-        ...state,
-        changeNicknameDone: false,
-        changeNicknameLoading: true,
-        changeNicknameError: null,
-      }
-    case CHANGE_NICKNAME_SUCCESS:
-      return {
-        ...state,
-        changeNicknameDone: true,
-        changeNicknameLoading: false,
-      }
-    case CHANGE_NICKNAME_FAILURE:
-      return {
-        ...state,
-        changeNicknameLoading: false,
-        changeNicknameError: action.error,
-      }
+      case SIGN_UP_REQUEST:
+        draft.signUpDone = false
+        draft.signUpLoading = true
+        draft.signUpError = null
+        break
 
-    case ADD_POST_TO_ME:
-      return {
-        ...state,
-        me: {
-          ...state.me,
-          Posts: [{ id: action.data }, ...state.me.Posts],
-        },
-      }
+      case SIGN_UP_SUCCESS:
+        draft.signUpDone = true
+        draft.signUpLoading = false
+        break
 
-    case REMOVE_POST_OF_ME:
-      return {
-        ...state,
-        me: {
-          ...state.me,
-          Posts: state.me.Posts.filter((el) => el.id !== action.data),
-        },
-      }
+      case SIGN_UP_FAILURE:
+        draft.signUpLoading = false
+        draft.signUpError = action.error
+        break
 
-    default:
-      return state
-  }
+      case CHANGE_NICKNAME_REQUEST:
+        draft.changeNicknameDone = false
+        draft.changeNicknameLoading = true
+        draft.changeNicknameError = null
+        break
+
+      case CHANGE_NICKNAME_SUCCESS:
+        draft.changeNicknameDone = true
+        draft.changeNicknameLoading = false
+        break
+
+      case CHANGE_NICKNAME_FAILURE:
+        draft.changeNicknameLoading = false
+        draft.changeNicknameError = action.error
+        break
+
+      case ADD_POST_TO_ME:
+        draft.me.Posts.unshift({ id: action.data })
+        break
+
+      case REMOVE_POST_OF_ME:
+        draft.me.Posts = draft.me.Posts.filter((el) => el.id !== action.data) //대입을 하긴 해야함 unshift같은거는 그냥 그 자체가 바뀌는거지만..
+        return
+
+      default:
+        return draft
+    }
+  })
 }
 
 export default reducer
