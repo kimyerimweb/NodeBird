@@ -1,4 +1,5 @@
 import shortId from 'shortid'
+import produce from 'immer' //불변성 지옥 해방!!
 
 export const initialState = {
   //이제 더미 데이터를 useState말고 여기다 넣으면 된다.
