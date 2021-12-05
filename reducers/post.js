@@ -1,5 +1,6 @@
 import shortId from 'shortid'
 import produce from 'immer'
+import faker from 'faker'
 
 export const initialState = {
   //이제 더미 데이터를 useState말고 여기다 넣으면 된다.
@@ -49,6 +50,33 @@ export const initialState = {
   addCommentDone: false,
   addCommentError: null,
 }
+
+initialState.mainPosts = initialState.mainPosts.concat(
+  Array(20) //지금은 20개지만 나중에 최적화 고려하면 수천개의 더미 데이터를 넣고 돌려서 끊김없는 최적화를 하는게 실력임
+    .fill()
+    .map(() => ({
+      id: shortId.generate(),
+      User: {
+        id: shortId.generate(),
+        nickname: faker.name.findName(),
+      },
+      content: faker.lorem.paragraph(),
+      Images: [
+        {
+          src: faker.image.imageUrl(),
+        },
+      ],
+      Comments: [
+        {
+          User: {
+            id: shortId.generate(),
+            nickname: faker.name.findName(),
+          },
+          content: faker.lorem.sentence(),
+        },
+      ],
+    }))
+)
 
 const dummyComment = (data) => ({
   id: shortId.generate(),
