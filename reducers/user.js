@@ -14,6 +14,12 @@ export const initialState = {
   changeNicknameLoading: false, //닉네임 바꾸기 시도중
   changeNicknameError: null,
   changeNicknameDone: false,
+  followLoading: false,
+  followError: null,
+  followDone: false,
+  unfollowLoading: false,
+  unfollowError: null,
+  unfollowDone: false,
 
   me: null,
   signUpDate: {},
@@ -38,6 +44,14 @@ export const CHANGE_NICKNAME_FAILURE = 'CHANGE_NICKNAME_FAILURE'
 
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME' //다른 리듀서 내부의 state를 바탕으로 이쪽 리듀서의 state를 변경하기 위한 액션
 export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME' //state를 바꾸는건 action이니까
+
+export const FOLLOW_REQUEST = 'FOLLOW_REQUEST'
+export const FOLLOW_SUCCESS = 'FOLLOW_SUCCESS'
+export const FOLLOW_FAILURE = 'FOLLOW_FAILURE'
+
+export const UNFOLLOW_REQUEST = 'UNFOLLOW_REQUEST'
+export const UNFOLLOW_SUCCESS = 'UNFOLLOW_SUCCESS'
+export const UNFOLLOW_FAILURE = 'UNFOLLOW_FAILURE'
 
 export const logInRequestAction = (data) => {
   return {
@@ -65,21 +79,27 @@ export const changeNicknameRequestAction = (data) => {
   }
 }
 
+export const followRequestAction = (data) => {
+  return {
+    type: FOLLOW_REQUEST,
+    data,
+  }
+}
+
+export const unfollowRequestAction = (data) => {
+  return {
+    type: UNFOLLOW_REQUEST,
+    data,
+  }
+}
+
 const dummyUser = (data) => ({
   ...data,
   nickname: 'zerocho',
   id: shortId.generate(),
   Posts: [],
-  Followings: [
-    { nickname: '제로초' },
-    { nickname: '부기초' },
-    { nickname: '냥냥' },
-  ],
-  Followers: [
-    { nickname: '제로초' },
-    { nickname: '부기초' },
-    { nickname: '냥냥' },
-  ],
+  Followings: [],
+  Followers: [],
 })
 
 const reducer = (state = initialState, action) => {
@@ -158,6 +178,45 @@ const reducer = (state = initialState, action) => {
       case REMOVE_POST_OF_ME:
         draft.me.Posts = draft.me.Posts.filter((el) => el.id !== action.data) //대입을 하긴 해야함 unshift같은거는 그냥 그 자체가 바뀌는거지만..
         return
+
+      case FOLLOW_REQUEST:
+        draft.followDone = false
+        draft.followLoading = true
+        draft.followError = null
+        break
+
+      case FOLLOW_SUCCESS:
+        draft.followDone = true
+        draft.followLoading = false
+        draft.me.Followings.push({
+          id: action.data.id,
+          nickname: action.data.nickname,
+        }) //팔로우 할 아이디(닉네임?)를 넣음
+        break
+
+      case FOLLOW_FAILURE:
+        draft.followLoading = false
+        draft.followError = action.error
+        break
+
+      case UNFOLLOW_REQUEST:
+        draft.unfollowDone = false
+        draft.unfollowLoading = true
+        draft.unfollowError = null
+        break
+
+      case UNFOLLOW_SUCCESS:
+        draft.unfollowDone = true
+        draft.unfollowLoading = false
+        draft.me.Followings = draft.me.Followings.filter(
+          (el) => el.id !== action.data
+        ) //팔로우 한 아이디를 넣음
+        break
+
+      case UNFOLLOW_FAILURE:
+        draft.unfollowLoading = false
+        draft.unfollowError = action.error
+        break
 
       default:
         return draft

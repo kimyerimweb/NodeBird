@@ -9,17 +9,6 @@ import Router from 'next/router'
 const Profile = () => {
   const { me } = useSelector((state) => state.user)
 
-  const followerList = [
-    { nickname: '제로초0' },
-    { nickname: '제로초1' },
-    { nickname: '제로초2' },
-  ]
-  const followingList = [
-    { nickname: '제로초3' },
-    { nickname: '제로초4' },
-    { nickname: '제로초5' },
-  ]
-
   useEffect(() => {
     //프로필 페이지에서 로그아웃시
     if (!(me && me.id)) {
@@ -38,8 +27,8 @@ const Profile = () => {
       </Head>
       <AppLayout>
         <NicknameEditForm />
-        <FollowList header="팔로잉" data={followingList} />
-        <FollowList header="팔로워" data={followerList} />
+        <FollowList header="팔로잉" data={me.Followings} />
+        <FollowList header="팔로워" data={me.Followers} />
       </AppLayout>
     </>
   )
