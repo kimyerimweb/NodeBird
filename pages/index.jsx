@@ -3,17 +3,32 @@ import { useSelector, useDispatch } from 'react-redux'
 import AppLayout from '../components/AppLayout'
 import PostForm from '../components/PostForm'
 import PostCard from '../components/PostCard'
-import { loadPostRequestAction } from '../reducers/post'
+import { LOAD_POSTS_REQUEST } from '../reducers/post'
+import { useInView } from 'react-intersection-observer'
 
 const Home = () => {
+  const [ref, inView] = useInView()
   const dispatch = useDispatch()
+  const { logInDone } = useSelector((state) => state.user)
+  const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector(
+    (state) => state.post
+  )
 
   useEffect(() => {
-    dispatch(loadPostRequestAction)
+    dispatch({
+      type: LOAD_POSTS_REQUEST,
+    })
   }, [])
 
-  const { logInDone } = useSelector((state) => state.user)
-  const mainPosts = useSelector((state) => state.post.mainPosts)
+  useEffect(() => {
+    if (inView && hasMorePosts && !loadPostsLoading) {
+      const lastId = mainPosts[mainPosts.length - 1]?.id
+      dispatch({
+        type: LOAD_POSTS_REQUEST,
+        lastId,
+      })
+    }
+  }, [inView, hasMorePosts, loadPostsLoading, mainPosts])
 
   return (
     <>
@@ -22,6 +37,7 @@ const Home = () => {
         {mainPosts.map((post) => (
           <PostCard post={post} key={post.id} />
         ))}
+        <div ref={hasMorePosts && !loadPostsLoading ? ref : undefined} />
       </AppLayout>
     </>
   )
