@@ -4,42 +4,12 @@ import faker from 'faker'
 
 export const initialState = {
   //이제 더미 데이터를 useState말고 여기다 넣으면 된다.
-  mainPosts: [
-    {
-      id: '1',
-      User: {
-        id: '1',
-        nickname: '김예림',
-      },
-      content: '첫 번째 게시글 #해시태그 #익스프레스',
-      Images: [
-        {
-          src: 'https://media.vlpt.us/images/cyheum/post/a21ac839-e534-4eb3-8fa5-342a45818a53/react-logo.png',
-        },
-        {
-          src: 'https://media.vlpt.us/images/wooder2050/post/d2764478-dc72-4cc9-9128-f66bfb8b3aa3/reactintroduction.png',
-        },
-        {
-          src: 'https://seokjun.kim/content/images/2020/11/stop-using-react.png',
-        },
-      ],
-      Comments: [
-        {
-          User: {
-            nickname: 'nero',
-          },
-          content: '우와 개정판이 나왔군요~',
-        },
-        {
-          User: {
-            nickname: 'zero',
-          },
-          content: '얼른 사고 싶어요',
-        },
-      ],
-    },
-  ],
+  mainPosts: [],
   imagePaths: [],
+  hasMorePosts: true,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -51,8 +21,8 @@ export const initialState = {
   addCommentError: null,
 }
 
-initialState.mainPosts = initialState.mainPosts.concat(
-  Array(20) //지금은 20개지만 나중에 최적화 고려하면 수천개의 더미 데이터를 넣고 돌려서 끊김없는 최적화를 하는게 실력임
+export const generateDummyPost = (number) =>
+  Array(number) //지금은 20개지만 나중에 최적화 고려하면 수천개의 더미 데이터를 넣고 돌려서 끊김없는 최적화를 하는게 실력임
     .fill()
     .map(() => ({
       id: shortId.generate(),
@@ -63,7 +33,7 @@ initialState.mainPosts = initialState.mainPosts.concat(
       content: faker.lorem.paragraph(),
       Images: [
         {
-          src: faker.image.imageUrl(),
+          src: faker.image.image(),
         },
       ],
       Comments: [
@@ -76,7 +46,6 @@ initialState.mainPosts = initialState.mainPosts.concat(
         },
       ],
     }))
-)
 
 const dummyComment = (data) => ({
   id: shortId.generate(),
@@ -120,6 +89,10 @@ const dummyPost = (data) => ({
   ],
 })
 
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST'
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS'
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE'
+
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST'
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS'
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE'
@@ -146,6 +119,10 @@ export const addCommentRequestAction = (data) => ({
   type: ADD_COMMENT_REQUEST,
   data,
 })
+
+export const loadPostRequestAction = {
+  type: LOAD_POST_REQUEST,
+}
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -200,6 +177,24 @@ const reducer = (state = initialState, action) => {
       case ADD_COMMENT_FAILURE:
         draft.addCommentLoading = false
         draft.addCommentError = action.data
+        break
+
+      case LOAD_POST_REQUEST:
+        draft.loadPostLoading = true
+        draft.loadPostDone = false
+        draft.loadPostError = null
+        break
+
+      case LOAD_POST_SUCCESS:
+        draft.mainPosts = action.data.concat(draft.mainPosts)
+        draft.loadPostDone = true
+        draft.loadPostLoading = false
+        draft.hasMorePosts = draft.mainPosts.length < 50
+        break
+
+      case LOAD_POST_FAILURE:
+        draft.loadPostLoading = false
+        draft.loadPostError = action.error
         break
 
       default:
