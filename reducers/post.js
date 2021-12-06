@@ -186,7 +186,7 @@ const reducer = (state = initialState, action) => {
         break
 
       case LOAD_POST_SUCCESS:
-        draft.mainPosts = action.data.concat(draft.mainPosts)
+        draft.mainPosts = draft.mainPosts.concat(action.data)
         draft.loadPostDone = true
         draft.loadPostLoading = false
         draft.hasMorePosts = draft.mainPosts.length < 50
