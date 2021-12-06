@@ -7,9 +7,9 @@ export const initialState = {
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true,
-  loadPostLoading: false,
-  loadPostDone: false,
-  loadPostError: null,
+  loadPostsLoading: false,
+  loadPostsDone: false,
+  loadPostsError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -89,9 +89,9 @@ const dummyPost = (data) => ({
   ],
 })
 
-export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST'
-export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS'
-export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE'
+export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST'
+export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS'
+export const LOAD_POSTS_FAILURE = 'LOAD_POSTS_FAILURE'
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST'
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS'
@@ -119,10 +119,6 @@ export const addCommentRequestAction = (data) => ({
   type: ADD_COMMENT_REQUEST,
   data,
 })
-
-export const loadPostRequestAction = {
-  type: LOAD_POST_REQUEST,
-}
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -179,22 +175,22 @@ const reducer = (state = initialState, action) => {
         draft.addCommentError = action.data
         break
 
-      case LOAD_POST_REQUEST:
-        draft.loadPostLoading = true
-        draft.loadPostDone = false
-        draft.loadPostError = null
+      case LOAD_POSTS_REQUEST:
+        draft.loadPostsLoading = true
+        draft.loadPostsDone = false
+        draft.loadPostsError = null
         break
 
-      case LOAD_POST_SUCCESS:
+      case LOAD_POSTS_SUCCESS:
         draft.mainPosts = draft.mainPosts.concat(action.data)
-        draft.loadPostDone = true
-        draft.loadPostLoading = false
+        draft.loadPostsDone = true
+        draft.loadPostsLoading = false
         draft.hasMorePosts = draft.mainPosts.length < 50
         break
 
-      case LOAD_POST_FAILURE:
-        draft.loadPostLoading = false
-        draft.loadPostError = action.error
+      case LOAD_POSTS_FAILURE:
+        draft.loadPostsLoading = false
+        draft.loadPostsError = action.error
         break
 
       default:
