@@ -1,8 +1,13 @@
-const http = require('http')
-const server = http.createServer((req, res) => {
-  console.log(req.url, req.method)
-  res.end('Hello Node')
+const express = require('express')
+const postRouter = require('./routes/post')
+const app = express()
+
+app.get('/api', (req, res) => {
+  res.send('hello express')
 })
-server.listen(3065, () => {
+
+app.use('/post', postRouter)
+
+app.listen(3065, () => {
   console.log('서버 실행 중')
 })
