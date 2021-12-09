@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false, //필수여부 true:필수 아님,false:필수
         unique: true, //유일한 값
       },
-      nuckname: {
+      nickname: {
         type: DataTypes.STRING(30), //데이터의 타입을 명시
         allowNull: false, //필수여부 true:필수 아님,false:필수
       },
