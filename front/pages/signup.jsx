@@ -15,9 +15,9 @@ const Signup = () => {
   const dispatch = useDispatch()
   const { signUpLoading } = useSelector((state) => state.user)
 
-  const [email, onChangeEmail] = useInput('')
-  const [nickname, onChangeNickname] = useInput('')
-  const [password, onChangePassword] = useInput('')
+  const [email, setEmail, onChangeEmail] = useInput('')
+  const [nickname, setNickname, onChangeNickname] = useInput('')
+  const [password, setPassword, onChangePassword] = useInput('')
 
   const [passwordCheck, setPasswordCheck] = useState('')
   const [passwordError, setPasswordError] = useState(false)
