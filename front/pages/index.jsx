@@ -4,19 +4,28 @@ import AppLayout from '../components/AppLayout'
 import PostForm from '../components/PostForm'
 import PostCard from '../components/PostCard'
 import { LOAD_POSTS_REQUEST } from '../reducers/post'
+import { LOAD_USER_REQUEST } from '../reducers/user'
 import { useInView } from 'react-intersection-observer'
 
 const Home = () => {
   const [ref, inView] = useInView()
   const dispatch = useDispatch()
-  const { logInDone } = useSelector((state) => state.user)
-  const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector(
-    (state) => state.post
-  )
+  const { me } = useSelector((state) => state.user)
+  const { mainPosts, hasMorePosts, loadPostsLoading, retweetError } =
+    useSelector((state) => state.post)
+
+  useEffect(() => {
+    if (retweetError) {
+      alert(retweetError)
+    }
+  }, [retweetError])
 
   useEffect(() => {
     dispatch({
       type: LOAD_POSTS_REQUEST,
+    })
+    dispatch({
+      type: LOAD_USER_REQUEST,
     })
   }, [])
 
@@ -33,7 +42,7 @@ const Home = () => {
   return (
     <>
       <AppLayout>
-        {logInDone && <PostForm />}
+        {me && <PostForm />}
         {mainPosts.map((post) => (
           <PostCard post={post} key={post.id} />
         ))}
