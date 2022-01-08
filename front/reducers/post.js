@@ -1,12 +1,16 @@
-import shortId from 'shortid'
-import produce from 'immer'
-import faker from 'faker'
+import produce from '../utils/produce'
 
 export const initialState = {
   //이제 더미 데이터를 useState말고 여기다 넣으면 된다.
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true,
+  likePostLoading: false,
+  likePostDone: false,
+  likePostError: null,
+  unlikePostLoading: false,
+  unlikePostDone: false,
+  unlikePostError: null,
   loadPostsLoading: false,
   loadPostsDone: false,
   loadPostsError: null,
@@ -19,75 +23,25 @@ export const initialState = {
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
+  uploadImagesLoading: false,
+  uploadImagesDone: false,
+  uploadImagesError: null,
+  retweetLoading: false,
+  retweetDone: false,
+  retweetError: null,
 }
 
-export const generateDummyPost = (number) =>
-  Array(number) //지금은 20개지만 나중에 최적화 고려하면 수천개의 더미 데이터를 넣고 돌려서 끊김없는 최적화를 하는게 실력임
-    .fill()
-    .map(() => ({
-      id: shortId.generate(),
-      User: {
-        id: shortId.generate(),
-        nickname: faker.name.findName(),
-      },
-      content: faker.lorem.paragraph(),
-      Images: [
-        {
-          src: faker.image.image(),
-        },
-      ],
-      Comments: [
-        {
-          User: {
-            id: shortId.generate(),
-            nickname: faker.name.findName(),
-          },
-          content: faker.lorem.sentence(),
-        },
-      ],
-    }))
+export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST'
+export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS'
+export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE'
 
-const dummyComment = (data) => ({
-  id: shortId.generate(),
-  content: data,
-  User: {
-    id: 1,
-    nickname: '제로초',
-  },
-  Imagrs: [],
-  Comments: [],
-})
+export const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST'
+export const LIKE_POST_SUCCESS = 'LIKE_POST_SUCCESS'
+export const LIKE_POST_FAILURE = 'LIKE_POST_FAILURE'
 
-const dummyPost = (data) => ({
-  id: data.id,
-  User: {
-    id: data.userId,
-    nickname: '예림킴',
-  },
-  content: data.content,
-  Images: [
-    {
-      src: 'https://media.vlpt.us/images/taese0ng/post/82c7a9ee-7d30-44eb-be74-6814dd66b64c/logo-vuejs-min.png',
-    },
-    {
-      src: 'https://t1.daumcdn.net/thumb/R720x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/6emG/image/ricOCxnz_i_AJbRNyQv7krfaoug',
-    },
-  ],
-  Comments: [
-    {
-      User: {
-        nickname: 'gero',
-      },
-      content: '이번엔 뷰군뇨',
-    },
-    {
-      User: {
-        nickname: 'sero',
-      },
-      content: '뷰가 좀 더 쉽긴 한 것 같네요',
-    },
-  ],
-})
+export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST'
+export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS'
+export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE'
 
 export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST'
 export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS'
@@ -105,6 +59,12 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST'
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS'
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE'
 
+export const RETWEET_REQUEST = 'RETWEET_REQUEST'
+export const RETWEET_SUCCESS = 'RETWEET_SUCCESS'
+export const RETWEET_FAILURE = 'RETWEET_FAILURE'
+
+export const REMOVE_IMAGE = 'REMOVE_IMAGE'
+
 export const addPostRequestAction = (data) => ({
   type: ADD_POST_REQUEST,
   data, //form에 뭔가 입력했을 때 다음으로 안넘어감 거기서 문제 있는 듯
@@ -120,9 +80,78 @@ export const addCommentRequestAction = (data) => ({
   data,
 })
 
-const reducer = (state = initialState, action) => {
-  return produce(state, (draft) => {
+const reducer = (state = initialState, action) =>
+  produce(state, (draft) => {
     switch (action.type) {
+      case RETWEET_REQUEST:
+        draft.retweetLoading = true
+        draft.retweetDone = false
+        draft.retweetError = null
+        break
+
+      case RETWEET_SUCCESS:
+        draft.retweetLoading = false
+        draft.retweetDone = true
+        draft.mainPosts.unshift(action.data)
+        break
+
+      case RETWEET_FAILURE:
+        draft.retweetLoading = false
+        draft.retweetError = action.data
+        break
+
+      case REMOVE_IMAGE:
+        draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data)
+        break
+
+      case UPLOAD_IMAGES_REQUEST:
+        draft.uploadImagesLoading = true
+        draft.uploadImagesDone = false
+        draft.uploadImagesError = null
+        break
+      case UPLOAD_IMAGES_SUCCESS: {
+        draft.imagePaths = action.data
+        draft.uploadImagesLoading = false
+        draft.uploadImagesDone = true
+        break
+      }
+      case UPLOAD_IMAGES_FAILURE:
+        draft.uploadImagesLoading = false
+        draft.uploadImagesError = action.error
+        break
+      case LIKE_POST_REQUEST:
+        draft.likePostLoading = true
+        draft.likePostDone = false
+        draft.likePostError = null
+        break
+      case LIKE_POST_SUCCESS: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId)
+        post.Likers.push({ id: action.data.UserId })
+        draft.likePostLoading = false
+        draft.likePostDone = true
+        break
+      }
+      case LIKE_POST_FAILURE:
+        draft.likePostLoading = false
+        draft.likePostError = action.error
+        break
+      case UNLIKE_POST_REQUEST:
+        draft.unlikePostLoading = true
+        draft.unlikePostDone = false
+        draft.unlikePostError = null
+        break
+      case UNLIKE_POST_SUCCESS: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId)
+        post.Likers = post.Likers.filter((v) => v.id !== action.data.UserId)
+        draft.unlikePostLoading = false
+        draft.unlikePostDone = true
+        break
+      }
+      case UNLIKE_POST_FAILURE:
+        draft.unlikePostLoading = false
+        draft.unlikePostError = action.error
+        break
+
       case ADD_POST_REQUEST:
         draft.addPostLoading = true
         draft.addPostDone = false
@@ -130,7 +159,8 @@ const reducer = (state = initialState, action) => {
         break
 
       case ADD_POST_SUCCESS:
-        draft.mainPosts.unshift(dummyPost(action.data))
+        draft.mainPosts.unshift(action.data)
+        draft.imagePaths = []
         draft.addPostDone = true
         draft.addPostLoading = false
         break
@@ -142,11 +172,14 @@ const reducer = (state = initialState, action) => {
 
       case REMOVE_POST_REQUEST:
         draft.removePostLoading = true
+        draft.removePostDone = false
         draft.removePostError = null
         break
 
       case REMOVE_POST_SUCCESS:
-        draft.mainPosts = draft.mainPosts.filter((el) => el.id !== action.data)
+        draft.mainPosts = draft.mainPosts.filter(
+          (el) => el.id !== action.data.PostId
+        )
         draft.removePostDone = true
         draft.removePostLoading = false
         break
@@ -164,10 +197,9 @@ const reducer = (state = initialState, action) => {
 
       case ADD_COMMENT_SUCCESS:
         const post = draft.mainPosts.find((v) => v.id === action.data.postId)
-        post.Comments.unshift(dummyComment(action.data.content))
+        post.Comments.unshift(action.data)
         draft.addCommentLoading = false
         draft.addCommentDone = true
-        draft.mainPosts = mainPosts
         break
 
       case ADD_COMMENT_FAILURE:
@@ -194,9 +226,8 @@ const reducer = (state = initialState, action) => {
         break
 
       default:
-        return draft
+        break
     }
   })
-}
 
 export default reducer
