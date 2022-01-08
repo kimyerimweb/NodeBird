@@ -1,7 +1,21 @@
-import shortId from 'shortid'
-import produce from 'immer'
+import produce from '../utils/produce'
 
 export const initialState = {
+  loadUserLoading: false,
+  loadUserDone: false,
+  loadUserError: null,
+  changeNicknameLoading: false, // 닉네임 변경 시도중
+  changeNicknameDone: false,
+  changeNicknameError: null,
+  loadFollowingsLoading: false,
+  loadFollowingsDone: false,
+  loadFollowingsError: null,
+  loadFollowersLoading: false,
+  loadFollowersDone: false,
+  loadFollowersError: null,
+  removeFollowerLoading: false,
+  removeFollowerDone: false,
+  removeFollowerError: null,
   logInLoading: false, //로그인 시도중
   logInError: null,
   logInDone: false,
@@ -25,6 +39,10 @@ export const initialState = {
   signUpDate: {},
   logInData: {},
 }
+
+export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST'
+export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS'
+export const LOAD_USER_FAILURE = 'LOAD_USER_FAILURE'
 
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST'
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
@@ -52,6 +70,18 @@ export const FOLLOW_FAILURE = 'FOLLOW_FAILURE'
 export const UNFOLLOW_REQUEST = 'UNFOLLOW_REQUEST'
 export const UNFOLLOW_SUCCESS = 'UNFOLLOW_SUCCESS'
 export const UNFOLLOW_FAILURE = 'UNFOLLOW_FAILURE'
+
+export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST'
+export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST'
+export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST'
+
+export const LOAD_FOLLOWINGS_REQUEST = 'LOAD_FOLLOWINGS_REQUEST'
+export const LOAD_FOLLOWINGS_SUCCESS = 'LOAD_FOLLOWINGS_SUCCESS'
+export const LOAD_FOLLOWINGS_FAILURE = 'LOAD_FOLLOWINGS_FAILURE'
+
+export const LOAD_FOLLOWERS_REQUEST = 'LOAD_FOLLOWERS_REQUEST'
+export const LOAD_FOLLOWERS_SUCCESS = 'LOAD_FOLLOWERS_SUCCESS'
+export const LOAD_FOLLOWERS_FAILURE = 'LOAD_FOLLOWERS_FAILURE'
 
 export const logInRequestAction = (data) => {
   return {
@@ -93,18 +123,68 @@ export const unfollowRequestAction = (data) => {
   }
 }
 
-const dummyUser = (data) => ({
-  ...data,
-  nickname: 'zerocho',
-  id: shortId.generate(),
-  Posts: [],
-  Followings: [],
-  Followers: [],
-})
-
-const reducer = (state = initialState, action) => {
-  return produce(state, (draft) => {
+const reducer = (state = initialState, action) =>
+  produce(state, (draft) => {
     switch (action.type) {
+      case REMOVE_FOLLOWER_REQUEST:
+        draft.removeFollowerLoading = true
+        draft.removeFollowerDone = false
+        draft.removeFollowerError = null
+        break
+
+      case REMOVE_FOLLOWER_SUCCESS:
+        draft.removeFollowerLoading = false
+        draft.me.Followers = draft.me.Followers.filter(
+          (v) => v.id !== action.data.UserId
+        )
+        draft.removeFollowerDone = true
+        break
+
+      case REMOVE_FOLLOWER_FAILURE:
+        draft.removeFollowerLoading = false
+        draft.removeFollowerError = action.error
+        break
+
+      case LOAD_FOLLOWINGS_REQUEST:
+        draft.loadFollowingsLoading = true
+        draft.loadFollowingsError = null
+        draft.loadFollowingsDone = false
+        break
+
+      case LOAD_FOLLOWINGS_SUCCESS:
+        draft.loadFollowingsLoading = false
+        draft.me.Followings = action.data
+        draft.loadFollowingsDone = true
+        break
+
+      case LOAD_FOLLOWINGS_FAILURE:
+        draft.loadFollowingsLoading = false
+        draft.loadFollowingsError = action.error
+        break
+
+      case LOAD_FOLLOWERS_REQUEST:
+        draft.loadFollowersLoading = true
+        draft.loadFollowersError = null
+        draft.loadFollowersDone = false
+        break
+
+      case LOAD_FOLLOWERS_SUCCESS:
+        draft.loadFollowersLoading = false
+        draft.me.Followers = action.data
+        draft.loadFollowersDone = true
+        break
+
+      case LOAD_FOLLOWERS_FAILURE:
+        draft.loadFollowersLoading = false
+        draft.loadFollowersError = action.error
+        break
+
+      case LOAD_USER_REQUEST:
+        draft.loadUserLoading = true
+        draft.loadUserError = null
+        draft.loadUserDone = false
+        break
+
       case LOG_IN_REQUEST:
         draft.logInLoading = true
         draft.logInError = null
@@ -164,6 +244,7 @@ const reducer = (state = initialState, action) => {
       case CHANGE_NICKNAME_SUCCESS:
         draft.changeNicknameDone = true
         draft.changeNicknameLoading = false
+        draft.me.nickname = action.data.nickname
         break
 
       case CHANGE_NICKNAME_FAILURE:
@@ -189,8 +270,7 @@ const reducer = (state = initialState, action) => {
         draft.followDone = true
         draft.followLoading = false
         draft.me.Followings.push({
-          id: action.data.id,
-          nickname: action.data.nickname,
+          id: action.data.UserId,
         }) //팔로우 할 아이디(닉네임?)를 넣음
         break
 
@@ -209,7 +289,7 @@ const reducer = (state = initialState, action) => {
         draft.unfollowDone = true
         draft.unfollowLoading = false
         draft.me.Followings = draft.me.Followings.filter(
-          (el) => el.id !== action.data
+          (el) => el.id !== action.data.UserId
         ) //팔로우 한 아이디를 넣음
         break
 
@@ -218,10 +298,26 @@ const reducer = (state = initialState, action) => {
         draft.unfollowError = action.error
         break
 
+      case LOAD_USER_REQUEST:
+        draft.loadUserLoading = true
+        draft.loadUserError = null
+        draft.loadUserDone = false
+        break
+
+      case LOAD_USER_SUCCESS:
+        draft.loadUserLoading = false
+        draft.me = action.data
+        draft.loadUserDone = true
+        break
+
+      case LOAD_USER_FAILURE:
+        draft.loadUserLoading = false
+        draft.loadUserError = action.error
+        break
+
       default:
-        return draft
+        break
     }
   })
-}
 
 export default reducer
