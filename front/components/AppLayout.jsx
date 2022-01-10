@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Link from 'next/link'
 import { Menu, Input, Row, Col } from 'antd'
-import LoginForm from './LoginForm'
-import UserProfile from './UserProfile'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
+
+import LoginForm from './LoginForm'
+import UserProfile from './UserProfile'
+
 import { createGlobalStyle } from 'styled-components'
 
 const Global = createGlobalStyle`
