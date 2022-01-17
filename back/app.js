@@ -19,13 +19,15 @@ db.sequelize
   .catch(console.error)
 
 const userRouter = require('./routes/user')
+const postRouter = require('./routes/post')
 const app = express()
 
 passportConfig()
 
 app.use(
   cors({
-    origin: true, //모두 다 허용, 실제 서비스 시 주소를 바꿔야 함
+    origin: 'http://localhost:3060',
+    credentials: true, //이제 브라우저에 쿠키 전달
   })
 )
 app.use(express.json())
@@ -42,6 +44,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use('/user', userRouter)
+app.use('/post', postRouter)
 
 app.listen(3065, () => {
   console.log('서버 실행 중')
