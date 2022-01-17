@@ -1,10 +1,11 @@
 import React from 'react'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { Form, Input, Button } from 'antd'
 import Link from 'next/link'
 import styled from 'styled-components'
-import useInput from '../hooks/useInput'
 import { useDispatch, useSelector } from 'react-redux'
+
+import useInput from '../hooks/useInput'
 import { logInRequestAction } from '../reducers/user'
 
 const ButtonWrapper = styled.div`
@@ -17,9 +18,15 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch()
+  const { logInLoading, logInError } = useSelector((state) => state.user)
   const [email, setEmail, onChangeEmail] = useInput('')
   const [password, setPassword, onChangePassword] = useInput('')
-  const { logInLoading } = useSelector((state) => state.user)
+
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError)
+    }
+  }, [logInError])
 
   const onSubmitForm = useCallback(() => {
     dispatch(logInRequestAction({ email, password }))

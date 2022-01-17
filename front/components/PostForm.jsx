@@ -1,18 +1,17 @@
-import { Button, Form, Input } from 'antd'
 import { useCallback, useRef, useEffect } from 'react'
+import { Button, Form, Input } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
+
 import useInput from '../hooks/useInput'
-import { addPostRequestAction } from '../reducers/post'
+import {
+  ADD_POST_REQUEST,
+  UPLOAD_IMAGES_REQUEST,
+  REMOVE_IMAGE,
+} from '../reducers/post'
 
 const PostForm = () => {
-  const imageInput = useRef()
-
-  const userId = useSelector((state) => state.user.me?.id)
-  const { imagePaths } = useSelector((state) => state.post)
-  const { addPostLoading } = useSelector((state) => state.post)
-  const { addPostDone } = useSelector((state) => state.post)
+  const { imagePaths, addPostDone } = useSelector((state) => state.post)
   const dispatch = useDispatch()
-
   const [text, setText, onChangeText] = useInput('')
 
   useEffect(() => {
@@ -22,12 +21,42 @@ const PostForm = () => {
   }, [addPostDone])
 
   const onSubmit = useCallback(() => {
-    dispatch(addPostRequestAction({ content: text, userId })) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
-  }, [text])
+    if (!text || !text.trim()) {
+      return alert('게시글을 작성하세요.')
+    }
 
+    const formData = new FormData()
+    imagePaths.forEach((p) => {
+      formData.append('image', p)
+    })
+    formData.append('content', text)
+    return dispatch({ type: ADD_POST_REQUEST, content: text, userId }) //액션은 원래 객체고 동적으로 만들 때만 함수라서..지금은 객체 맞음
+  }, [text, imagePaths])
+
+  const imageInput = useRef()
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click() //이미지 업로드용 인풋은 숨겨져 있고 버튼이 대신하고 있는데, 버튼을 누르면 인풋을 누르게끔 ref를 이용한다.
   }, [imageInput.current])
+
+  const onChangeImages = useCallback((e) => {
+    console.log('images',e.target.files)
+    const imageFormData = new FormData()
+    [].forEach.call(e.target.files, (f) => {
+      imageFormData.append('image', f);
+    });
+
+    dispatch({
+      type: UPLOAD_IMAGES_REQUEST,
+      data: imageFormData
+    })
+  },[])
+
+  const onRemoveImage = useCallback((index) => () => {
+    dispatch({
+      type: REMOVE_IMAGE,
+      data: index
+    })
+  },[])
 
   return (
     <Form
@@ -42,21 +71,22 @@ const PostForm = () => {
         placeholder="어떤 신기한 일이 있었나요?"
       />
       <div>
-        <input type="file" multiple hidden ref={imageInput} />
+        <input type="file" name="image" multiple hidden ref={imageInput} onChange={onChangeImages}/>
         <Button onClick={onClickImageUpload}>이미지 업로드</Button>
         <Button
           type="primary"
           style={{ float: 'right' }}
           htmlType="submit"
-          loading={addPostLoading}
         >
           짹짹
         </Button>
         <div>
-          {imagePaths.map((v) => (
+          {imagePaths.map((v,i) => (
             <div key={v} style={{ display: 'inline-block' }}>
               <img src={v} style={{ width: '200px' }} alt={v} />
-              <Button>제거</Button>
+              <div>
+                <Button onClick={onRemoveImage(i)}>제거</Button>
+              </div>
             </div>
           ))}
         </div>
