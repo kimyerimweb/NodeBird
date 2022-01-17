@@ -160,7 +160,6 @@ const reducer = (state = initialState, action) =>
 
       case ADD_POST_SUCCESS:
         draft.mainPosts.unshift(action.data)
-        draft.imagePaths = []
         draft.addPostDone = true
         draft.addPostLoading = false
         break
