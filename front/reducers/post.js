@@ -195,7 +195,7 @@ const reducer = (state = initialState, action) =>
         break
 
       case ADD_COMMENT_SUCCESS:
-        const post = draft.mainPosts.find((v) => v.id === action.data.postId)
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId)
         post.Comments.unshift(action.data)
         draft.addCommentLoading = false
         draft.addCommentDone = true
@@ -213,7 +213,7 @@ const reducer = (state = initialState, action) =>
         break
 
       case LOAD_POSTS_SUCCESS:
-        draft.mainPosts = draft.mainPosts.concat(action.data)
+        draft.mainPosts = action.data.concat(draft.mainPosts)
         draft.loadPostsDone = true
         draft.loadPostsLoading = false
         draft.hasMorePosts = draft.mainPosts.length < 50
