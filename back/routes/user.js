@@ -116,7 +116,7 @@ router.post('/', isNotLoggedIn, async (req, res, next) => {
   }
 })
 
-router.patch('/nickname', isLoggedIn, (req, res, next) => {
+router.patch('/nickname', isLoggedIn, async (req, res, next) => {
   try {
     await User.update(
       {
@@ -127,6 +127,38 @@ router.patch('/nickname', isLoggedIn, (req, res, next) => {
       }
     )
     res.status(200).json({ nickname: req.body.nickname })
+  } catch (err) {
+    console.error(err)
+    next(err)
+  }
+})
+
+router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => {
+  try {
+    const id = parseInt(req.params.userId)
+    const user = await User.findOne({ where: { id } })
+
+    if (!user) {
+      res.status(403).send('존재하지 않는 사용자입니다.')
+    }
+    await user.addFollowers(req.user.id)
+    res.status(200).json({ id })
+  } catch (err) {
+    console.error(err)
+    next(err)
+  }
+})
+
+router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => {
+  try {
+    const id = parseInt(req.params.userId)
+    const user = await User.findOne({ where: { id } })
+
+    if (!user) {
+      res.status(403).send('존재하지 않는 사용자입니다.')
+    }
+    await user.removeFollowers(req.user.id)
+    res.status(200).json({ id })
   } catch (err) {
     console.error(err)
     next(err)

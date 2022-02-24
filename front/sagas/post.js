@@ -57,6 +57,7 @@ function* retweet(action) {
 }
 
 function uploadImagesAPI(data) {
+  //form 데이터는 그대로 들어가야한다. json으로 감싸지 말아야함
   return axios.post('/post/images', data)
 }
 
